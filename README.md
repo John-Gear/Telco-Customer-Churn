@@ -58,3 +58,8 @@ feature engineering и корректной валидации модели.
 ```bash
 pip install -r requirements.txt
 python telco.py
+```
+
+## Воспроизвести проект можно на Kaggle
+
+https://www.kaggle.com/code/johngearonline/teclo-customer-churn-ml-pipeline-johngear
