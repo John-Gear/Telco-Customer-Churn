@@ -9,6 +9,11 @@ import os
 import json
 import joblib
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
+from src.logger import get_logger
+
+# инициируем логгирование
+logger = get_logger('train')
+logger.info('Training started')
 
 df = load_data()
 df = main_preprocessor(df)
@@ -24,6 +29,9 @@ X_train, X_test, y_train, y_test = train_test_split(
     stratify=y,
     random_state=42
 )
+
+# сверка размерности после сплита
+logger.info(f'X_train shape: {X_train.shape}, X_test shape: {X_test.shape}')
 
 # формируем список числовых признаков
 num_features = [
@@ -101,6 +109,8 @@ metrics = {
     'confusion_matrix': confusion_matrix(y_test, y_pred).tolist()
 }
 
+logger.info(f'Metrics: \n%s', json.dumps(metrics, indent=4))
+
 # сохранение метрик
 os.makedirs('artifacts', exist_ok=True)
 
@@ -108,3 +118,5 @@ joblib.dump(pipeline_pipe, 'artifacts/model.joblib')
 
 with open('artefacts/matrics.json', 'w', encoding='utf-8') as f:
     json.dump(metrics, f, ensure_ascii=False, indent=2)
+
+    logger.info('Model saved to artefacts')
