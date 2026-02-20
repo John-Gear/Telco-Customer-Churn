@@ -10,6 +10,7 @@ import json
 import joblib
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
 from src.logger import get_logger
+from features import num_features, cat_binary_features, cat_multiclass_features
 
 # инициируем логгирование
 logger = get_logger('train')
@@ -32,37 +33,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # сверка размерности после сплита
 logger.info(f'X_train shape: {X_train.shape}, X_test shape: {X_test.shape}')
-
-# формируем список числовых признаков
-num_features = [
-    'Стаж клиента',
-    'Ежемесячные платежи',
-    'Совокупные платежи за всё время',
-    'Пожилой клиент'
-]
-
-# формируем список бинарных признаков
-cat_binary_features = [
-    'пол',
-    'Наличие супруга(и)',
-    'Иждивенцы',
-    'Наличие телефонной связи',
-    'Электронный счёт'
-]
-
-# формируем список многозначных признаков
-cat_multiclass_features = [
-    'Несколько телефонных линий',
-    'Тип интернет-подключения',
-    'Онлайн-защита',
-    'Онлайн-резервное копирование',
-    'Защита устройств',
-    'Техническая поддержка',
-    'Стриминговое телевидение',
-    'Стриминг фильмов',
-    'Тип контракта',
-    'Способ оплаты'
-]
 
 # создаем StandardScaler для числовых признаков
 numeric_transformer = StandardScaler()
