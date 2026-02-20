@@ -21,7 +21,6 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-
 # формируем список числовых признаков
 num_features = [
     'Стаж клиента',
