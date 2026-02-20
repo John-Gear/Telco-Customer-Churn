@@ -8,7 +8,7 @@
 ## Ключевые идеи проекта
 
 - **Источник данных — SQLite**
-- **Модель сохранена как артефакт** `artifacts/model.joblib` (внутри весь Pipeline: scaler + encoders + logistic regression).
+- **Модель сохранена как артефакт** `artefacts/model.joblib` (внутри весь Pipeline: scaler + encoders + logistic regression).
 - **Inference отделён от обучения**: API не обучает модель, API только делает предсказания по готовому артефакту.
 - **Контракт признаков** вынесен в `features.py`, чтобы одинаково использовать списки колонок в `train.py` и `app.py`.
 
@@ -28,7 +28,7 @@ telco_churn/
 │   └── sql/
 │       └── Telco-Customer-Churn.db       # SQLite база данных
 │
-├── artifacts/
+├── artefacts/
 │   ├── model.joblib                      # сохранённый sklearn inference артефакт
 │   └── metrics.json                      # метрики
 │
@@ -65,10 +65,10 @@ telco_churn/
 3. Разделение на X/y, train/test split
 3. Сборка ColumnTransformer, StandardScaler для числовых, OneHotEncoder для бинарных категориальных, OneHotEncoder для мультиклассовых категориальных
 4. Обучение модели (Logistic Regression) внутри Pipeline
-5. Сохранение артефактов: artifacts/model.joblib, artifacts/metrics.json
+5. Сохранение артефактов: artefacts/model.joblib, artefacts/metrics.json
 
 ### **Inference (predict/API)**
-- В artifacts/model.joblib сохранён весь Pipeline, поэтому на вход API можно подавать признаки (X) как в обучении.
+- В artefacts/model.joblib сохранён весь Pipeline, поэтому на вход API можно подавать признаки (X) как в обучении.
 - В API есть валидация признаков (EXPECTED_COLS из src/features.py) чтобы модель не упала.
 
 ---
@@ -100,7 +100,7 @@ docker run -p 5000:5000 telco-api
 
 ## Результаты
 
-- Результаты обучения модели зафиксированы в artifacts/metrics.json.
+- Результаты обучения модели зафиксированы в artefacts/metrics.json.
 - Logistic Regression используется как базовая и интерпретируемая модель по ROC-AUC в данном проект (про выбор модели, тюнинг, регуляризацию, etc. почитать в Telco notebook.ipynb)
 
 ---
