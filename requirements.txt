@@ -8,3 +8,4 @@ catboost
 joblib
 pyyaml
 flask
+ipykernel

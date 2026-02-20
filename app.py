@@ -9,7 +9,7 @@ logger = get_logger('api')
 
 app = Flask(__name__)
 
-MODEL_PATH = 'artifacts/model.joblib'
+MODEL_PATH = 'artefacts/model.joblib'
 ID_COL = 'Идентификатор'
 APP_THRESHOLD = THRESHOLD # забираем порог из predict.py т.к. у нас нет единого env. Принято решение хранить порог только там
 EXPECTED_COLS = num_features + cat_binary_features + cat_multiclass_features # наши колонки,  чтобы зафиксировать контракт инференс vs train

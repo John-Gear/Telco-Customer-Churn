@@ -10,7 +10,7 @@ import json
 import joblib
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
 from src.logger import get_logger
-from features import num_features, cat_binary_features, cat_multiclass_features
+from src.features import num_features, cat_binary_features, cat_multiclass_features
 
 # инициируем логгирование
 logger = get_logger('train')
@@ -73,20 +73,20 @@ y_probs = pipeline_pipe.predict_proba(X_test)[:, 1]
 
 # метрики
 metrics = {
-    'precision': float(precision_score(y_test, y_pred)),
-    'recall': float(recall_score(y_test, y_pred)),
-    'roc_auc': float(roc_auc_score(y_test, y_probs)),
-    'confusion_matrix': confusion_matrix(y_test, y_pred).tolist()
+    'precision': float(precision_score(y_test, y_pred, pos_label="Yes")),
+    'recall': float(recall_score(y_test, y_pred, pos_label="Yes")),
+    'roc_auc': float(roc_auc_score((y_test == "Yes").astype(int), y_probs)),
+    'confusion_matrix': confusion_matrix(y_test, y_pred, labels=["No", "Yes"]).tolist()
 }
 
 logger.info(f'Metrics: \n%s', json.dumps(metrics, indent=4))
 
 # сохранение метрик
-os.makedirs('artifacts', exist_ok=True)
+os.makedirs('artefacts', exist_ok=True)
 
-joblib.dump(pipeline_pipe, 'artifacts/model.joblib')
+joblib.dump(pipeline_pipe, 'artefacts/model.joblib')
 
-with open('artefacts/matrics.json', 'w', encoding='utf-8') as f:
+with open('artefacts/metrics.json', 'w', encoding='utf-8') as f:
     json.dump(metrics, f, ensure_ascii=False, indent=2)
 
     logger.info('Model saved to artefacts')
