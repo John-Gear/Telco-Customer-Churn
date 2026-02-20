@@ -95,15 +95,11 @@ y_probs = pipeline_pipe.predict_proba(X_test)[:, 1]
 
 # метрики
 metrics = {
-    'accuracy': float(accuracy_score(y_test, y_pred)),
     'precision': float(precision_score(y_test, y_pred)),
     'recall': float(recall_score(y_test, y_pred)),
-    'f1': float(f1_score(y_test, y_pred)),
     'roc_auc': float(roc_auc_score(y_test, y_probs)),
     'confusion_matrix': confusion_matrix(y_test, y_pred).tolist()
 }
-
-print(metrics)
 
 # сохранение метрик
 os.makedirs('artifacts', exist_ok=True)
