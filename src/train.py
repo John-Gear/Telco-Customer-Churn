@@ -5,6 +5,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
+import os
+import json
+import joblib
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
 
 df = load_data()
 df = main_preprocessor(df)
@@ -88,3 +92,23 @@ pipeline_pipe.fit(X_train, y_train)
 
 y_pred = pipeline_pipe.predict(X_test)
 y_probs = pipeline_pipe.predict_proba(X_test)[:, 1]
+
+# метрики
+metrics = {
+    'accuracy': float(accuracy_score(y_test, y_pred)),
+    'precision': float(precision_score(y_test, y_pred)),
+    'recall': float(recall_score(y_test, y_pred)),
+    'f1': float(f1_score(y_test, y_pred)),
+    'roc_auc': float(roc_auc_score(y_test, y_probs)),
+    'confusion_matrix': confusion_matrix(y_test, y_pred).tolist()
+}
+
+print(metrics)
+
+# сохранение метрик
+os.makedirs('artifacts', exist_ok=True)
+
+joblib.dump(pipeline_pipe, 'artifacts/model.joblib')
+
+with open('artefacts/matrics.json', 'w', encoding='utf-8') as f:
+    json.dump(metrics, f, ensure_ascii=False, indent=2)
