@@ -9,8 +9,8 @@ def load_model():
 # df_features: получаем по апи/бд новых клиентов, превращаем их в pandas.DataFrame
 # предсказываем вероятности
 def predict_proba(df_features):
-    model = load_model,
-    probs = model.predict_proba(df_features)[:, 1]
+    model = load_model()
+    probs = model.predict_proba(df)[:, 1]
     return probs
 
 # предсказываем класс 0/1 (при пороге threshold=0.2869508152860422)
