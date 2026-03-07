@@ -1,25 +1,32 @@
-from src.db import read_sql
-import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from src.features import num_features, cat_binary_features, cat_multiclass_features
 
-BASE_QERY = "SELECT * FROM TelcoCustomerChurn"
+def main_preprocessor():
+    # создаем StandardScaler для числовых признаков
+    numeric_transformer = StandardScaler()
 
-def load_data():
-    return read_sql(BASE_QERY)
+    # создаем OneHotEncoder для бинарных признаков
+    binary_transformer = OneHotEncoder(
+        drop='if_binary',
+        handle_unknown='ignore',
+        sparse_output=False
+    )
 
-def main_preprocessor(df):
+    # создаем OneHotEncoder для многозначных признаков
+    multiclass_transformer = OneHotEncoder(
+        drop='first',
+        handle_unknown='ignore',
+        sparse_output=False
+    )
 
-    # переводим колонки на русский язык (т.к. onehot изначально был настроен на РУ названия)
-    df.columns = ["Идентификатор", "пол", "Пожилой клиент", "Наличие супруга(и)", "Иждивенцы", "Стаж клиента", "Наличие телефонной связи", "Несколько телефонных линий", "Тип интернет-подключения", "Онлайн-защита", "Онлайн-резервное копирование", "Защита устройств", "Техническая поддержка", "Стриминговое телевидение", "Стриминг фильмов", "Тип контракта", "Электронный счёт", "Способ оплаты", "Ежемесячные платежи", "Совокупные платежи за всё время", "Отток клиента"]
+    # создаем препроцессор для трех типов данных
+    local_preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', numeric_transformer, num_features),
+            ('cat_bin', binary_transformer, cat_binary_features),
+            ('cat_multi', multiclass_transformer, cat_multiclass_features)
+        ]
+    )
 
-    # удаляем повторяющиеся строки
-    cols_without_id = df.columns.drop('Идентификатор')
-    df = df.drop_duplicates(subset=cols_without_id, keep='first')
-
-    # меняем все Nan в "Совокупные платежи за всё время" на "0" (используем формат str. чтобы не возникла потом путаница)
-    mask = df['Стаж клиента'] == 0
-    df.loc[mask, 'Совокупные платежи за всё время'] = '0'
-
-    # Переводим все значения колонки 'Совокупные платежи за всё время' из str в float
-    df['Совокупные платежи за всё время'] = pd.to_numeric(df['Совокупные платежи за всё время'], errors='coerce')
-
-    return df
+    return local_preprocessor

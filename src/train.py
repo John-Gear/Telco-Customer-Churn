@@ -1,5 +1,6 @@
-from src.preprocessor import load_data, main_preprocessor
+from src.data_cleaner import load_data, main_cleaner
 from sklearn.model_selection import train_test_split
+from src.preprocessor import main_preprocessor
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
@@ -17,7 +18,7 @@ logger = get_logger('train')
 logger.info('Training started')
 
 df = load_data()
-df = main_preprocessor(df)
+df = main_cleaner(df)
 
 # Отделяем целевую переменную (y) от датасета (X)
 y = df['Отток клиента']
@@ -34,31 +35,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 # сверка размерности после сплита
 logger.info(f'X_train shape: {X_train.shape}, X_test shape: {X_test.shape}')
 
-# создаем StandardScaler для числовых признаков
-numeric_transformer = StandardScaler()
-
-# создаем OneHotEncoder для бинарных признаков
-binary_transformer = OneHotEncoder(
-    drop='if_binary',
-    handle_unknown='ignore',
-    sparse_output=False
-    )
-
-# создаем OneHotEncoder для многозначных признаков
-multiclass_transformer = OneHotEncoder(
-    drop='first',
-    handle_unknown='ignore',
-    sparse_output=False
-)
-
-# создаем препроцессор для трех типов данных
-local_preprocessor = ColumnTransformer(
-    transformers=[
-        ('num', numeric_transformer, num_features),
-        ('cat_bin', binary_transformer, cat_binary_features),
-        ('cat_multi', multiclass_transformer, cat_multiclass_features)
-    ]
-)
+# получаем препроцессор из отдельного модуля
+local_preprocessor = main_preprocessor()
 
 # Pipeline модель LogisticRegression
 pipeline_pipe = Pipeline(steps=[

@@ -2,21 +2,15 @@ from flask import Flask, request, jsonify
 import pandas as pd
 import joblib
 from src.logger import get_logger
-from src.predict import THRESHOLD
-from src.features import num_features, cat_binary_features, cat_multiclass_features
+from src.predict import THRESHOLD, predict_proba, predict
 
 logger = get_logger('api')
 
 app = Flask(__name__)
 
-MODEL_PATH = 'artefacts/model.joblib'
-ID_COL = 'Идентификатор'
 APP_THRESHOLD = THRESHOLD # забираем порог из predict.py т.к. у нас нет единого env. Принято решение хранить порог только там
-EXPECTED_COLS = num_features + cat_binary_features + cat_multiclass_features # наши колонки,  чтобы зафиксировать контракт инференс vs train
 
-# один раз загружаем модель при старте сервера
-model = joblib.load(MODEL_PATH)
-logger.info('API started, model load')
+logger.info('API started')
 
 # проверка жив ли сервер
 @app.get('/health')
@@ -37,17 +31,14 @@ def predict():
     
     df = pd.DataFrame(rows)
 
-    for col in [ID_COL]: # проверка на случай, если нам поступил датафрейм с "Идентификатор". Дропаем, т.к. при обучении дропали эту колонку, иначе модель упадет
-        if col in df.columns:
-            df = df.drop(columns=[col])
-
-    missing = [c for c in EXPECTED_COLS if c not in df.columns] # валидация полученного датафрейма. Если колонки будут отличатся, то модель упадет
-    if missing:
-        return jsonify({"error": "missing columns", "missing": missing}), 400
-    df = df[EXPECTED_COLS]
-
-    probs = model.predict_proba(df)[:, 1] # получаем вероятности и предсказания для новых данных
-    preds = (probs >= APP_THRESHOLD).astype(int)
+    try:
+        probs = predict_proba(df)  # внутри уже применится cleaner + pipeline(preprocessor + model)
+        preds = predict(df, threshold=APP_THRESHOLD)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        logger.exception('Prediction failed')
+        return jsonify({'error': f'Ошибка инференса: {str(e)}'}), 500
 
     return jsonify({
         'Вероятности': probs.tolist(),
