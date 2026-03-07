@@ -34,7 +34,8 @@ telco_churn/
 │
 ├── src/
 │   ├── db.py                             # загрузка данных из SQLite
-│   ├── preprocessor.py                   # чистка/приведение типов (без split и без fit моделей)
+│   ├── data_cleaner.py                   # чистка/приведение типов (без split и без fit моделей)
+│   ├── preprocessor.py                   # препроцессор для категориальных и числовых данных
 │   ├── features.py                       # списки колонок: num/cat_binary/cat_multiclass
 │   ├── train.py                          # обучение + сохранение model.joblib и metrics.json
 │   ├── predict.py                        # порог THRESHOLD и вспомогательная логика inference
